@@ -5,10 +5,12 @@ import processing.data.*;
 import processing.event.*;
 import processing.opengl.*;
 
-import controlP5.*;
-import ketai.ui.*;
+import apwidgets.*;
+import android.text.InputType;
+import android.view.inputmethod.EditorInfo;
+
+//import controlP5.*;
 import ketai.sensors.*;
-import ketai.data.*;
 import processing.opengl.*;
 
 import java.util.HashMap;
@@ -40,15 +42,17 @@ public class obviagaude extends PApplet {
 	float rot = 0;
 	float rot2 = 0;
 	int sze;
-	ControlP5 cp5;
+	// ControlP5 cp5;
 	PGraphics pg;
-	Textfield hername_i;
-	Textfield hisname_i;
+	// Textfield hername_i;
+	// Textfield hisname_i;
 
-	float accM;
+	float accM = 0;
 
 	KetaiSensor sensor;
 	float accelerometerX, accelerometerY, accelerometerZ;
+	APWidgetContainer container;
+	APEditText textField;
 
 	public void reinit() {
 		c = 0;
@@ -65,13 +69,15 @@ public class obviagaude extends PApplet {
 		if (wdth > hgth) {
 			sze = hgth;
 		}
-		fs = sze / ((nl) * 2) + 2;
+		fs = sze / ((nl + 1) * 2) + 2;
 	}
 
 	@Override
 	public void setup() {
+		container = new APWidgetContainer(this);
 		sensor = new KetaiSensor(this);
 		sensor.start();
+
 		orientation(LANDSCAPE);
 
 		if (displayWidth > displayHeight) {
@@ -177,44 +183,60 @@ public class obviagaude extends PApplet {
 	}
 
 	public void set() {
-		names[0] = hername_i.getText();
-		names[1] = hisname_i.getText();
+		// names[0] = hername_i.getText();
+		// names[1] = hisname_i.getText();
 		reinit();
 	}
 
 	public void buildGUI() {
-		cp5 = new ControlP5(this, f);
-		hername_i = cp5.addTextfield("hername").setPosition(20, 60)
-				.setSize(fs * 5, fs).setFont(f).setColorBackground(color(255))
-				.setColorCursor(color(0)).setColorForeground(color(0))
-				.setColorActive(color(0)).setText(names[0])
-				.setLabelVisible(false).setColor(color(0));
-		cp5.addTextlabel("hernamelabel").setText("Her name: ")
-				.setPosition(20, 20).setColorValue(color(0)).setFont(f);
-
-		hisname_i = cp5.addTextfield("hisname").setPosition(20, 160)
-				.setSize(fs * 5, fs).setFont(f).setLabelVisible(false)
-				.setColorBackground(color(255)).setColorCursor(color(0))
-				.setColorForeground(color(0)).setText(names[1])
-				.setColorActive(color(0)).setColor(color(0));
-		cp5.addTextlabel("hisnamelabel").setText("His name: ")
-				.setPosition(20, 120).setColorValue(color(0)).setFont(f);
-
-		cp5.addBang("set").setPosition(20, 220).setSize(80, 40)
-				.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+		textField = new APEditText(0, 50, width / 2, 50);
+		container.addWidget(textField);
+		textField.setInputType(InputType.TYPE_CLASS_TEXT); // Set the input type
+															// to text
+		textField.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+		/*
+		 * cp5 = new ControlP5(this, f); hername_i =
+		 * cp5.addTextfield("hername").setPosition(20, 60) .setSize(40 * 5,
+		 * 40).setFont(f).setColorBackground(color(255))
+		 * .setColorCursor(color(0)).setColorForeground(color(0))
+		 * .setColorActive(color(0)).setText(names[0])
+		 * .setLabelVisible(false).setColor(color(0));
+		 * 
+		 * cp5.addTextlabel("hernamelabel").setText("Her name: ")
+		 * .setPosition(20, 20).setColorValue(color(0)).setFont(f);
+		 * 
+		 * hisname_i = cp5.addTextfield("hisname").setPosition(20, 160)
+		 * .setSize(40 * 5, 40).setFont(f).setLabelVisible(false)
+		 * .setColorBackground(color(255)).setColorCursor(color(0))
+		 * .setColorForeground(color(0)).setText(names[1])
+		 * .setColorActive(color(0)).setColor(color(0));
+		 * 
+		 * cp5.addTextlabel("hisnamelabel").setText("His name: ")
+		 * .setPosition(20, 120).setColorValue(color(0)).setFont(f);
+		 * 
+		 * cp5.addBang("set").setPosition(20, 220).setSize(80, 40)
+		 * .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+		 */
 	}
 
 	public void onAccelerometerEvent(float x, float y, float z) {
 		accelerometerX = x;
 		accelerometerY = y;
 		accelerometerZ = z;
-		accM = (accelerometerX * accelerometerX + accelerometerY
-				* accelerometerY + accelerometerZ * accelerometerZ) * 2;
+		/*
+		 * accM = (accelerometerX * accelerometerX + accelerometerY
+		 * accelerometerY + accelerometerZ * accelerometerZ) * 2;
+		 */
+		accM = (accelerometerX + accelerometerY + accelerometerZ) * 10;
 	}
 
+
 	public void mouseDragged() {
-		rot = map(mouseX, width / 2, width - 50, 0, PI);
-		rot2 = map(mouseY, height / 2, height - 50, 0, PI);
+		if (mouseX >= (displayWidth - sze) / 2
+				&& mouseX <= ((displayWidth - sze) / 2) + sze) {
+			rot = map(mouseX, sze / 2, sze - 50, 0, PI);
+			rot2 = map(mouseY, sze / 2, sze - 50, 0, PI);
+		}
 	}
 
 	public int sketchWidth() {
